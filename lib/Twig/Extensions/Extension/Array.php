@@ -21,6 +21,7 @@ class Twig_Extensions_Extension_Array extends Twig_Extension
     {
         $filters = array(
              new Twig_SimpleFilter('shuffle', 'twig_shuffle_filter'),
+             new Twig_SimpleFilter('column_sum', 'twig_column_sum_filter'),
         );
 
         return $filters;
@@ -52,4 +53,32 @@ function twig_shuffle_filter($array)
     shuffle($array);
 
     return $array;
+}
+
+/**
+ * Sums a column an array.
+ *
+ * @param array|Traversable $array An array or arrays
+ * @param string $column key from each array you wish to sum
+ *
+ * @return integer
+ */
+function twig_column_sum_filter($array, $column)
+{
+    if ($array instanceof Traversable) {
+        $array = iterator_to_array($array, false);
+    }
+
+    if (function_exists('array_column')) {
+        $columnsArray = array_column($aray, $column);
+    } else {
+        $columnsArray = [];
+        foreach ($array as $subArray) {
+            if (isset($subArray[$column])) {
+                $columnsArray[] = $subArray[$column];
+            }
+        };
+    }
+
+    return array_sum($columnsArray);
 }
